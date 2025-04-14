@@ -78,6 +78,12 @@ app.layout = html.Div([
             'overflow': 'hidden',
             'textOverflow': 'ellipsis',
         }
+    ),
+    
+    dcc.Interval(
+        id='interval-component',
+        interval=60*1000,  # Update every minute
+        n_intervals=0
     )
 ])
 
@@ -88,9 +94,16 @@ app.layout = html.Div([
      Output("log-table", "data")],
     [Input("date-range", "start_date"),
      Input("date-range", "end_date"),
-     Input("machine-dropdown", "value")]
+     Input("machine-dropdown", "value"),
+     Input('interval-component', 'n_intervals')]
 )
-def update_dashboard(start_date, end_date, machine_id):
+def update_dashboard(start_date, end_date, machine_id, n):
+    # Add some fresh data periodically
+    if n % 5 == 0:  # Every 5 minutes
+        new_data = generate_data(50)
+        global df
+        df = pd.concat([df, new_data]).drop_duplicates().reset_index(drop=True)
+    
     filtered_df = df.copy()
     
     # Apply date filter
@@ -110,7 +123,12 @@ def update_dashboard(start_date, end_date, machine_id):
         err_df, 
         x="error_code", 
         title="Incident Frequency by Error Code",
-        color="error_code"
+        color="error_code",
+        color_discrete_map={
+            "E-100": "#FF7F0E",
+            "E-200": "#1F77B4",
+            "E-300": "#2CA02C"
+        }
     )
     
     fig2 = px.scatter(
@@ -118,7 +136,12 @@ def update_dashboard(start_date, end_date, machine_id):
         x="timestamp", 
         y="task_duration", 
         color="machine_id",
-        title="Task Duration Over Time"
+        title="Task Duration Over Time",
+        labels={
+            "timestamp": "Time",
+            "task_duration": "Duration (minutes)",
+            "machine_id": "Machine ID"
+        }
     )
     
     return fig1, fig2, filtered_df.to_dict("records")
