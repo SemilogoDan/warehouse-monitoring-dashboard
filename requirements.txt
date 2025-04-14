@@ -42,3 +42,5 @@ python-nmap==0.7.1
 dash==2.16.1
 gunicorn==21.2.0
 flask==2.2.2
+werkzeug==2.3.8
+
