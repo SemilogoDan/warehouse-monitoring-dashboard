@@ -45,7 +45,7 @@ app.layout = html.Div(
                 "borderRadius": "8px"
             },
             children=[
-                html.H1("🏭 Warehouse Operations Dashboard", style={"fontSize": "2.8em"}),
+                html.H1("🏭 Semilogo Warehouse Operations Dashboard", style={"fontSize": "2.8em"}),
                 html.P("Monitor real-time performance and identify potential issues", style={"fontSize": "1.2em"})
             ]
         ),
