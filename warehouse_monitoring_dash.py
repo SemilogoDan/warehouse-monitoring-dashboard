@@ -6,7 +6,7 @@ import pandas as pd
 
 # Initialize Dash app
 app = Dash(__name__)
-app.title = "Warehouse Monitoring Dashboard"
+app.title = "Semilogo Designed Warehouse Monitoring Dashboard"
 server = app.server
 
 # --- Data Generation ---
@@ -186,7 +186,7 @@ app.layout = html.Div(
         html.Footer(
             style={"textAlign": "center", "marginTop": "30px", "padding": "10px", "fontSize": "0.9em", "color": "#777"},
             children=[
-                html.P("© 2025 Warehouse Monitoring System")
+                html.P("© 2025 Semilogo Warehouse Monitoring System")
             ]
         )
     ]
