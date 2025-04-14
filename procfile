@@ -1,0 +1,1 @@
+web: gunicorn warehouse_monitoring_dash:app.server
