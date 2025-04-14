@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 web: gunicorn --workers 2 --timeout 120 warehouse_monitoring_dash:server
+=======
+web: gunicorn --workers 2 --timeout 120 warehouse_monitoring_dash:server
+>>>>>>> 49e35aab735215212e2f8cbcaa2d85f47ac23ddd
