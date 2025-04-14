@@ -1,6 +1,6 @@
 # 🏭 Semilogo Warehouse Monitoring Dashboard
 
-[![Dashboard Preview](https://via.placeholder.com/800x400?text=Semilogo+Dashboard+Preview)](https://warehouse-monitoring-dashboard.onrender.com/)
+<!--- [![Dashboard Preview](https://via.placeholder.com/800x400?text=Semilogo+Dashboard+Preview)](https://warehouse-monitoring-dashboard.onrender.com/) -->
 
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Dash](https://img.shields.io/badge/Dash-00CA7D?style=for-the-badge&logo=plotly&logoColor=white)](https://plotly.com/dash/)
@@ -94,8 +94,6 @@ pip install -r requirements.txt
 ###  Run the application :
 python warehouse_dashboard.py
 
-### Access the dashboard :
-Open your web browser and navigate to http://127.0.0.1:8050/
 
 ##  Online Deployment
 The dashboard is also deployed and accessible online via Live Demo .
