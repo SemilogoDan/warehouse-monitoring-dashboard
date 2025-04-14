@@ -31,58 +31,119 @@ df["timestamp"] = pd.to_datetime(df["timestamp"])
 # App layout
 app.layout = html.Div(
     style={
-        "fontFamily": "Arial, sans-serif",
+        "fontFamily": "'Open Sans', sans-serif",
         "margin": "0 auto",
-        "maxWidth": "1200px",
-        "padding": "20px"
+        "maxWidth": "1400px",
+        "padding": "20px",
+        "backgroundColor": "#f9f9f9",
+        "color": "#333",
+        "lineHeight": "1.6"
     },
     children=[
-        html.H1("📊 Warehouse Monitoring Dashboard", style={"textAlign": "center", "marginBottom": "40px"}),
+        # Header
+        html.Header(
+            style={"textAlign": "center", "marginBottom": "40px"},
+            children=[
+                html.H1("📊 Warehouse Monitoring Dashboard", style={"fontSize": "2.5rem", "color": "#2c3e50"}),
+                html.P("Real-time insights into warehouse operations", style={"fontSize": "1.2rem", "color": "#7f8c8d"})
+            ]
+        ),
 
+        # Filters Section
         html.Div(
-            style={"display": "flex", "justifyContent": "space-between", "flexWrap": "wrap", "marginBottom": "30px"},
+            style={
+                "display": "flex",
+                "justifyContent": "space-between",
+                "alignItems": "center",
+                "flexWrap": "wrap",
+                "marginBottom": "30px",
+                "gap": "20px"
+            },
             children=[
                 html.Div([
-                    html.Label("📅 Select Date Range"),
+                    html.Label("📅 Select Date Range", style={"display": "block", "marginBottom": "10px", "fontWeight": "bold"}),
                     dcc.DatePickerRange(
                         id="date-range",
                         min_date_allowed=df["timestamp"].min(),
                         max_date_allowed=df["timestamp"].max(),
                         start_date=df["timestamp"].min(),
-                        end_date=df["timestamp"].max()
+                        end_date=df["timestamp"].max(),
+                        style={"width": "100%"}
                     )
-                ], style={"marginBottom": "20px"}),
+                ], style={"flex": "1"}),
 
                 html.Div([
-                    html.Label("⚙️ Select Machine"),
+                    html.Label("⚙️ Select Machine", style={"display": "block", "marginBottom": "10px", "fontWeight": "bold"}),
                     dcc.Dropdown(
                         id="machine-dropdown",
                         options=[{"label": m, "value": m} for m in df["machine_id"].unique()],
                         placeholder="Select Machine",
-                        style={"width": "200px"}
+                        style={"width": "100%"}
                     )
-                ])
+                ], style={"flex": "1"})
             ]
         ),
 
-        html.Div([
-            dcc.Graph(id="incident-graph"),
-            dcc.Graph(id="duration-graph"),
-        ], style={"marginBottom": "30px"}),
+        # Graphs Section
+        html.Div(
+            style={
+                "display": "grid",
+                "gridTemplateColumns": "repeat(auto-fit, minmax(400px, 1fr))",
+                "gap": "20px",
+                "marginBottom": "40px"
+            },
+            children=[
+                dcc.Loading(
+                    dcc.Graph(id="incident-graph", style={"height": "400px", "borderRadius": "8px"}),
+                    type="circle"
+                ),
+                dcc.Loading(
+                    dcc.Graph(id="duration-graph", style={"height": "400px", "borderRadius": "8px"}),
+                    type="circle"
+                )
+            ]
+        ),
 
-        html.H3("📋 Task Logs"),
-        dash_table.DataTable(
-            id="log-table",
-            columns=[{"name": i, "id": i} for i in df.columns],
-            page_size=10,
-            style_table={"overflowX": "auto"},
-            style_cell={"textAlign": "left", "padding": "5px"},
-            style_header={"backgroundColor": "#f4f4f4", "fontWeight": "bold"},
-            style_data_conditional=[
-                {
-                    "if": {"filter_query": '{status} = "failure"'},
-                    "backgroundColor": "#ffe6e6"
+        # Logs Table
+        html.Div([
+            html.H3("📋 Task Logs", style={"marginBottom": "20px", "color": "#2c3e50"}),
+            dash_table.DataTable(
+                id="log-table",
+                columns=[{"name": i, "id": i} for i in df.columns],
+                page_size=10,
+                style_table={"overflowX": "auto", "borderRadius": "8px", "border": "1px solid #ddd"},
+                style_cell={
+                    "textAlign": "left",
+                    "padding": "10px",
+                    "fontSize": "14px",
+                    "whiteSpace": "normal",
+                    "height": "auto"
+                },
+                style_header={
+                    "backgroundColor": "#ecf0f1",
+                    "fontWeight": "bold",
+                    "fontSize": "16px",
+                    "borderBottom": "2px solid #bdc3c7"
+                },
+                style_data_conditional=[
+                    {
+                        "if": {"filter_query": '{status} = "failure"'},
+                        "backgroundColor": "#ffe6e6",
+                        "color": "#c0392b"
+                    }
+                ],
+                style_data={
+                    "border": "1px solid #ddd",
+                    "borderRadius": "8px"
                 }
+            )
+        ]),
+
+        # Footer
+        html.Footer(
+            style={"marginTop": "40px", "textAlign": "center", "color": "#7f8c8d", "fontSize": "0.9rem"},
+            children=[
+                "Developed by Your Name | Powered by Dash and Plotly"
             ]
         )
     ]
@@ -111,7 +172,8 @@ def update_dashboard(start_date, end_date, machine_id):
         filtered_df[filtered_df["status"] == "failure"],
         x="error_code",
         title="Error Code Distribution",
-        color_discrete_sequence=["indianred"]
+        color_discrete_sequence=["indianred"],
+        template="plotly_white"
     )
 
     fig2 = px.scatter(
@@ -120,7 +182,8 @@ def update_dashboard(start_date, end_date, machine_id):
         y="task_duration",
         color="machine_id",
         title="Task Duration Over Time",
-        template="plotly_white"
+        template="plotly_white",
+        labels={"timestamp": "Date", "task_duration": "Duration (minutes)"}
     )
 
     return fig1, fig2, filtered_df.to_dict("records")
