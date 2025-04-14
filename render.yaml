@@ -3,5 +3,4 @@ services:
     name: warehouse-dashboard
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:server
-    plan: free
+    startCommand: gunicorn warehouse_monitoring_dash:server
