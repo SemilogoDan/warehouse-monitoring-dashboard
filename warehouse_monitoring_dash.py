@@ -78,10 +78,7 @@ app.layout = html.Div([
             'overflow': 'hidden',
             'textOverflow': 'ellipsis',
         }
-    ),
-    
-    # Hidden div to store the data
-    html.Div(id='data-store', style={'display': 'none'})
+    )
 ])
 
 # ---------------------- Callbacks ----------------------
