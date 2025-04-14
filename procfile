@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 gunicorn warehouse_monitoring_dash:server
+=======
+gunicorn warehouse_monitoring_dash:server
+>>>>>>> e231eddad342400f60d37695e11bf9f594a7e764
