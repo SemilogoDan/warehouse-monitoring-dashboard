@@ -25,7 +25,7 @@ def simulate_logs(n=500):
 def setup_database():
     conn = sqlite3.connect("warehouse.db")
     c = conn.cursor()
-    c.execute('''
+    c.execute(''' 
         CREATE TABLE IF NOT EXISTS logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp TEXT,
@@ -56,6 +56,8 @@ def load_data():
 # ---------------------- Step 4: Dash dashboard ----------------------
 app = Dash(__name__)
 app.title = "Warehouse Monitoring Dashboard"
+
+server = app.server  # 👈 Add this line here to expose the server for deployment
 
 # Setup DB and insert simulated logs only if empty
 setup_database()
