@@ -1,5 +1,3 @@
-# warehouse_monitoring_dash.py
-
 import random
 import sqlite3
 import pandas as pd
@@ -124,4 +122,3 @@ def update_dashboard(start_date, end_date, machine_id):
 # ---------------------- Run app ----------------------
 if __name__ == '__main__': 
     app.run(debug=True)
-    
