@@ -34,7 +34,7 @@ app.layout = html.Div(
         "color": "#333"
     },
     children=[
-        # Header
+        # Header (rest of your header code)
         html.Div(
             style={
                 "textAlign": "center",
@@ -50,7 +50,7 @@ app.layout = html.Div(
             ]
         ),
 
-        # Filters
+        # Filters (rest of your filter code)
         html.Div(
             style={
                 "display": "flex",
@@ -102,7 +102,7 @@ app.layout = html.Div(
             ]
         ),
 
-        # KPIs
+        # KPIs (rest of your KPI code)
         html.Div(
             style={
                 "display": "grid",
@@ -155,10 +155,12 @@ app.layout = html.Div(
                 dcc.Graph(id="duration-over-time-chart", style={"backgroundColor": "white", "borderRadius": "8px", "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"}),
                 dcc.Graph(id="error-distribution-chart", style={"backgroundColor": "white", "borderRadius": "8px", "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"}),
                 dcc.Graph(id="machine-performance-chart", style={"backgroundColor": "white", "borderRadius": "8px", "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"}),
+                # Add the new graph here
+                dcc.Graph(id="status-over-time-chart", style={"backgroundColor": "white", "borderRadius": "8px", "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"}),
             ]
         ),
 
-        # Data Table
+        # Data Table (rest of your data table code)
         html.Div(
             style={"marginBottom": "20px"},
             children=[
@@ -182,7 +184,7 @@ app.layout = html.Div(
             ]
         ),
 
-        # Footer
+        # Footer (rest of your footer code)
         html.Footer(
             style={"textAlign": "center", "marginTop": "30px", "padding": "10px", "fontSize": "0.9em", "color": "#777"},
             children=[
@@ -202,7 +204,8 @@ app.layout = html.Div(
      Output("total-tasks-kpi", "children"),
      Output("success-rate-kpi", "children"),
      Output("avg-duration-kpi", "children"),
-     Output("failure-rate-kpi", "children")],
+     Output("failure-rate-kpi", "children"),
+     Output("status-over-time-chart", "figure")], # Add the new output
     [Input("date-range", "start_date"),
      Input("date-range", "end_date"),
      Input("machine-dropdown", "value"),
@@ -263,6 +266,14 @@ def update_dashboard(start_date, end_date, machine_id, error_codes):
         template="plotly_white"
     )
 
+    # --- New Chart: Status Over Time ---
+    status_over_time = filtered_df.groupby(pd.Grouper(key='timestamp', freq='M'))['status'].value_counts(normalize=True).mul(100).rename('percentage').reset_index()
+    status_over_time_fig = px.line(status_over_time, x='timestamp', y='percentage', color='status',
+                                  title='Task Status Over Time',
+                                  labels={'timestamp': 'Month', 'percentage': 'Percentage', 'status': 'Status'},
+                                  color_discrete_sequence=["#5cb85c", "#d9534f"],
+                                  template="plotly_white")
+
     return (
         task_status_fig,
         duration_over_time_fig,
@@ -273,6 +284,7 @@ def update_dashboard(start_date, end_date, machine_id, error_codes):
         success_rate,
         avg_duration,
         failure_rate,
+        status_over_time_fig # Return the new figure
     )
 
 if __name__ == '__main__':
