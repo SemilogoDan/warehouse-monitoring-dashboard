@@ -54,10 +54,11 @@ def load_data():
     return df
 
 # ---------------------- Step 4: Dash dashboard ----------------------
+# Initialize Dash app
 app = Dash(__name__)
 app.title = "Warehouse Monitoring Dashboard"
-
-server = app.server  # 👈 Add this line here to expose the server for deployment
+# Expose the server for Gunicorn to use
+server = app.server  # This is the WSGI app that Gunicorn needs
 
 # Setup DB and insert simulated logs only if empty
 setup_database()
@@ -123,3 +124,4 @@ def update_dashboard(start_date, end_date, machine_id):
 # ---------------------- Run app ----------------------
 if __name__ == '__main__':
     app.run(debug=True)
+    
