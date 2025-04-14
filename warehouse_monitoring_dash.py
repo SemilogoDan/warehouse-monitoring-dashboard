@@ -68,58 +68,58 @@ df = load_data()
 df["timestamp"] = pd.to_datetime(df["timestamp"])
 
 # Layout
-app.layout = html.Div([
-    html.H1("Warehouse Monitoring Dashboard", style={"textAlign": "center"}),
+app.layout = html.Div([ 
+    html.H1("Warehouse Monitoring Dashboard", style={"textAlign": "center"}), 
 
-    dcc.DatePickerRange(
-        id="date-range",
-        min_date_allowed=df["timestamp"].min().date(),
-        max_date_allowed=df["timestamp"].max().date(),
-        start_date=df["timestamp"].min().date(),
-        end_date=df["timestamp"].max().date(),
-    ),
+    dcc.DatePickerRange( 
+        id="date-range", 
+        min_date_allowed=df["timestamp"].min().date(), 
+        max_date_allowed=df["timestamp"].max().date(), 
+        start_date=df["timestamp"].min().date(), 
+        end_date=df["timestamp"].max().date(), 
+    ), 
 
-    dcc.Dropdown(
-        id="machine-dropdown",
-        options=[{"label": m, "value": m} for m in df["machine_id"].unique()],
-        value=None,
-        placeholder="Select Machine (Optional)",
-        multi=False,
-        style={"marginTop": "10px"}
-    ),
+    dcc.Dropdown( 
+        id="machine-dropdown", 
+        options=[{"label": m, "value": m} for m in df["machine_id"].unique()], 
+        value=None, 
+        placeholder="Select Machine (Optional)", 
+        multi=False, 
+        style={"marginTop": "10px"} 
+    ), 
 
-    dcc.Graph(id="incident-graph"),
-    dcc.Graph(id="duration-graph"),
-    html.H3("Log Records"),
-    dash_table.DataTable(
-        id="log-table",
-        columns=[{"name": i, "id": i} for i in df.columns],
-        style_table={"overflowX": "auto"},
-        page_size=10
-    )
+    dcc.Graph(id="incident-graph"), 
+    dcc.Graph(id="duration-graph"), 
+    html.H3("Log Records"), 
+    dash_table.DataTable( 
+        id="log-table", 
+        columns=[{"name": i, "id": i} for i in df.columns], 
+        style_table={"overflowX": "auto"}, 
+        page_size=10 
+    ) 
 ])
 
-@app.callback(
-    [Output("incident-graph", "figure"),
-     Output("duration-graph", "figure"),
-     Output("log-table", "data")],
-    [Input("date-range", "start_date"),
-     Input("date-range", "end_date"),
-     Input("machine-dropdown", "value")]
-)
-def update_dashboard(start_date, end_date, machine_id):
-    filtered_df = df[(df["timestamp"] >= pd.to_datetime(start_date)) & (df["timestamp"] <= pd.to_datetime(end_date))]
-    if machine_id:
-        filtered_df = filtered_df[filtered_df["machine_id"] == machine_id]
+@app.callback( 
+    [Output("incident-graph", "figure"), 
+     Output("duration-graph", "figure"), 
+     Output("log-table", "data")], 
+    [Input("date-range", "start_date"), 
+     Input("date-range", "end_date"), 
+     Input("machine-dropdown", "value")] 
+) 
+def update_dashboard(start_date, end_date, machine_id): 
+    filtered_df = df[(df["timestamp"] >= pd.to_datetime(start_date)) & (df["timestamp"] <= pd.to_datetime(end_date))] 
+    if machine_id: 
+        filtered_df = filtered_df[filtered_df["machine_id"] == machine_id] 
 
-    err_df = filtered_df[filtered_df["status"] == "failure"]
+    err_df = filtered_df[filtered_df["status"] == "failure"] 
     fig1 = px.histogram(err_df, x="error_code", title="Incident Frequency by Error Code")
 
-    fig2 = px.scatter(filtered_df, x="timestamp", y="task_duration", color="machine_id",
+    fig2 = px.scatter(filtered_df, x="timestamp", y="task_duration", color="machine_id", 
                       title="Task Duration Over Time")
 
     return fig1, fig2, filtered_df.to_dict("records")
 
 # ---------------------- Run app ----------------------
-if __name__ == '__main__':
+if __name__ == '__main__': 
     app.run(debug=True)
