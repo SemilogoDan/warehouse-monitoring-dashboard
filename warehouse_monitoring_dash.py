@@ -12,10 +12,16 @@ server = app.server
 # --- Data Generation ---
 def generate_data(n=1000):
     now = datetime.now()
+    past_limit = now - timedelta(days=1)  # Ensure we don't go beyond 1 day in the past
+    timestamps = []
+    for _ in range(n):
+        random_minutes = random.randint(0, 1440)
+        timestamps.append(now - timedelta(minutes=random_minutes))
+
     status = [random.choice(['success'] * 9 + ['failure']) for _ in range(n)]
     error_codes = [random.choice(["E-100", "E-200", "E-300"] if s == "failure" else ["None"]) for s in status]
     return pd.DataFrame({
-        "timestamp": [now - timedelta(minutes=random.randint(0, 1440)) for _ in range(n)],
+        "timestamp": timestamps,
         "machine_id": [f"M-{random.randint(1, 5)}" for _ in range(n)],
         "task_duration": [round(random.uniform(5.0, 60.0), 2) for _ in range(n)],
         "status": status,
@@ -34,7 +40,7 @@ app.layout = html.Div(
         "color": "#333"
     },
     children=[
-        # Header (rest of your header code)
+        # Header
         html.Div(
             style={
                 "textAlign": "center",
@@ -50,7 +56,7 @@ app.layout = html.Div(
             ]
         ),
 
-        # Filters (rest of your filter code)
+        # Filters
         html.Div(
             style={
                 "display": "flex",
@@ -102,7 +108,7 @@ app.layout = html.Div(
             ]
         ),
 
-        # KPIs (rest of your KPI code)
+        # KPIs
         html.Div(
             style={
                 "display": "grid",
@@ -155,12 +161,12 @@ app.layout = html.Div(
                 dcc.Graph(id="duration-over-time-chart", style={"backgroundColor": "white", "borderRadius": "8px", "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"}),
                 dcc.Graph(id="error-distribution-chart", style={"backgroundColor": "white", "borderRadius": "8px", "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"}),
                 dcc.Graph(id="machine-performance-chart", style={"backgroundColor": "white", "borderRadius": "8px", "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"}),
-                # Add the new graph here
+                # New Chart: Status Over Time
                 dcc.Graph(id="status-over-time-chart", style={"backgroundColor": "white", "borderRadius": "8px", "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"}),
             ]
         ),
 
-        # Data Table (rest of your data table code)
+        # Data Table
         html.Div(
             style={"marginBottom": "20px"},
             children=[
@@ -184,7 +190,7 @@ app.layout = html.Div(
             ]
         ),
 
-        # Footer (rest of your footer code)
+        # Footer
         html.Footer(
             style={"textAlign": "center", "marginTop": "30px", "padding": "10px", "fontSize": "0.9em", "color": "#777"},
             children=[
