@@ -13,8 +13,10 @@ server = app.server
 def generate_data(n=1000):
     """
     Generates a Pandas DataFrame with simulated warehouse data.
+
     Args:
-        n (int): The number of data points to generate. Defaults to 1000.
+        n (int): The number of data points to generate.  Defaults to 1000.
+
     Returns:
         pandas.DataFrame: A DataFrame with columns:
             - timestamp (datetime): Timestamps within the last 24 hours.
@@ -29,10 +31,9 @@ def generate_data(n=1000):
     for _ in range(n):
         random_minutes = random.randint(0, 1440)
         timestamps.append(now - timedelta(minutes=random_minutes))
+
     status = [random.choice(['success'] * 9 + ['failure']) for _ in range(n)]
-    error_codes = [
-        random.choice(["E-100", "E-200", "E-300"] if s == "failure" else ["None"]) for s in status
-    ]
+    error_codes = [random.choice(["E-100", "E-200", "E-300"] if s == "failure" else ["None"]) for s in status]
     return pd.DataFrame({
         "timestamp": timestamps,
         "machine_id": [f"M-{random.randint(1, 5)}" for _ in range(n)],
@@ -69,6 +70,7 @@ app.layout = html.Div(
                 html.P("Monitor real-time performance and identify potential issues", style={"fontSize": "1.2em"})  # Subtitle
             ]
         ),
+
         # Filters Section
         html.Div(
             style={
@@ -87,8 +89,8 @@ app.layout = html.Div(
                             id="date-range",
                             min_date_allowed=df["timestamp"].min().date(),
                             max_date_allowed=df["timestamp"].max().date(),
-                            start_date=datetime.now().date(),  # Default to today's date
-                            end_date=datetime.now().date(),  # Default to today's date
+                            start_date=df["timestamp"].min().date(),
+                            end_date=df["timestamp"].max().date(),
                             style={"width": "100%"}  # Full width within the container
                         )
                     ]
@@ -120,6 +122,7 @@ app.layout = html.Div(
                 ),
             ]
         ),
+
         # KPIs Section
         html.Div(
             style={
@@ -159,6 +162,7 @@ app.layout = html.Div(
                 ),
             ]
         ),
+
         # Charts Section
         html.Div(
             style={
@@ -176,6 +180,7 @@ app.layout = html.Div(
                 dcc.Graph(id="status-over-time-chart", style={"backgroundColor": "white", "borderRadius": "8px", "boxShadow": "0 2px 4px rgba(0,0,0,0.1)"}),
             ]
         ),
+
         # Data Table Section
         html.Div(
             style={"marginBottom": "20px"},
@@ -199,6 +204,7 @@ app.layout = html.Div(
                 ),
             ]
         ),
+
         # Footer Section
         html.Footer(
             style={"textAlign": "center", "marginTop": "30px", "padding": "10px", "fontSize": "0.9em", "color": "#777"},  # Centered, smaller text
@@ -211,33 +217,31 @@ app.layout = html.Div(
 
 # --- Callbacks ---
 @app.callback(
-    [
-        Output("task-status-chart", "figure"),
-        Output("duration-over-time-chart", "figure"),
-        Output("error-distribution-chart", "figure"),
-        Output("machine-performance-chart", "figure"),
-        Output("task-log-table", "data"),
-        Output("total-tasks-kpi", "children"),
-        Output("success-rate-kpi", "children"),
-        Output("avg-duration-kpi", "children"),
-        Output("failure-rate-kpi", "children"),
-        Output("status-over-time-chart", "figure")  # Add the new output
-    ],
-    [
-        Input("date-range", "start_date"),
-        Input("date-range", "end_date"),
-        Input("machine-dropdown", "value"),
-        Input("error-code-dropdown", "value")
-    ]
+    [Output("task-status-chart", "figure"),
+     Output("duration-over-time-chart", "figure"),
+     Output("error-distribution-chart", "figure"),
+     Output("machine-performance-chart", "figure"),
+     Output("task-log-table", "data"),
+     Output("total-tasks-kpi", "children"),
+     Output("success-rate-kpi", "children"),
+     Output("avg-duration-kpi", "children"),
+     Output("failure-rate-kpi", "children"),
+     Output("status-over-time-chart", "figure")],  # Add the new output
+    [Input("date-range", "start_date"),
+     Input("date-range", "end_date"),
+     Input("machine-dropdown", "value"),
+     Input("error-code-dropdown", "value")]
 )
 def update_dashboard(start_date, end_date, machine_id, error_codes):
     """
     Callback function to update the dashboard based on user-selected filters.
+
     Args:
         start_date (str): Start date from the date range picker.
         end_date (str): End date from the date range picker.
         machine_id (str): Selected machine ID from the dropdown.
         error_codes (list): Selected error codes from the dropdown.
+
     Returns:
         tuple: A tuple containing updated Plotly figures and KPI values.
     """
@@ -298,25 +302,22 @@ def update_dashboard(start_date, end_date, machine_id, error_codes):
     )
 
     # --- New Chart: Status Over Time ---
-    status_over_time = (
-        filtered_df.groupby(pd.Grouper(key="timestamp", freq="M"))["status"]
-        .value_counts(normalize=True)
-        .mul(100)
-        .rename("percentage")
-        .reset_index()
-    )
-    status_over_time["timestamp"] = pd.to_datetime(status_over_time["timestamp"])  # Ensure proper datetime format
-    status_over_time_fig = px.line(
-        status_over_time,
-        x="timestamp",
-        y="percentage",
-        color="status",
-        title="Task Status Over Time",
-        labels={"timestamp": "Month", "percentage": "Percentage", "status": "Status"},
-        color_discrete_sequence=["#5cb85c", "#d9534f"],
-        template="plotly_white"
-    )
-    status_over_time_fig.update_xaxes(tickformat="%b %Y", dtick="M1")  # Format x-axis to display months
+    print("First few timestamps in filtered_df (before time filter):")  # Debugging
+    print(filtered_df['timestamp'].head())
+
+    now = datetime.now()
+    one_month_ago = now - timedelta(days=30)
+    status_over_time_df = filtered_df[filtered_df['timestamp'] >= one_month_ago]  # Filter to last 30 days
+
+    print("\nFirst few timestamps in status_over_time_df (after time filter):")  # Debugging
+    print(status_over_time_df['timestamp'].head())
+
+    status_over_time = status_over_time_df.groupby(pd.Grouper(key='timestamp', freq='M'))['status'].value_counts(normalize=True).mul(100).rename('percentage').reset_index()
+    status_over_time_fig = px.line(status_over_time, x='timestamp', y='percentage', color='status',
+                                  title='Task Status Over Time',
+                                  labels={'timestamp': 'Month', 'percentage': 'Percentage', 'status': 'Status'},
+                                  color_discrete_sequence=["#5cb85c", "#d9534f"],
+                                  template="plotly_white")
 
     return (
         task_status_fig,
@@ -328,8 +329,8 @@ def update_dashboard(start_date, end_date, machine_id, error_codes):
         success_rate,
         avg_duration,
         failure_rate,
-        status_over_time_fig  # Return the new figure
+        status_over_time_fig
     )
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run_server(debug=True)
