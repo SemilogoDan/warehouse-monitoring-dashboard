@@ -1,3 +1,5 @@
+# warehouse_monitoring_dash.py
+
 import random
 import sqlite3
 import pandas as pd
@@ -52,11 +54,10 @@ def load_data():
     return df
 
 # ---------------------- Step 4: Dash dashboard ----------------------
-# Initialize Dash app
 app = Dash(__name__)
 app.title = "Warehouse Monitoring Dashboard"
-# Expose the server for Gunicorn to use
-server = app.server  # This is the WSGI app that Gunicorn needs
+
+server = app.server  # 👈 Add this line here to expose the server for deployment
 
 # Setup DB and insert simulated logs only if empty
 setup_database()
